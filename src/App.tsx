@@ -11,12 +11,14 @@ interface Candidate {
 
 function App() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const get = async () => {
       const response = await fetch('https://candidates-consumer-docker.onrender.com/candidates')
       const data = await response.json()
       setCandidates(data)
+      setLoading(false)
     }
     
     get()
@@ -41,24 +43,32 @@ function App() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {candidates.length ? candidates.map((candidate) => (
-              <TableRow key={candidate.id}>
-                <TableCell align="center">
-                  {candidate.name}
-                </TableCell>
-                <TableCell align="center">
-                  {candidate.email}
-                </TableCell>
-                <TableCell align="center">
-                  {candidate.desiredPosition}
-                </TableCell>
-              </TableRow>
-            )) : (
+            {!loading && !candidates.length ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
                   Nenhum candidato encontrado
                 </TableCell>
               </TableRow>
+            ) : (
+              !loading ? candidates.map((candidate) => (
+                <TableRow key={candidate.id}>
+                  <TableCell align="center">
+                    {candidate.name}
+                  </TableCell>
+                  <TableCell align="center">
+                    {candidate.email}
+                  </TableCell>
+                  <TableCell align="center">
+                    {candidate.desiredPosition}
+                  </TableCell>
+                </TableRow>
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    Carregando...
+                  </TableCell>
+              </TableRow>
+              )
             )}
           </TableBody>
         </Table>
